@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: FindResource deployment
+
+Parameters:
+  S3Bucket:
+    Description: 'The name of the bucket that contains your lambda source code'
+    Type: String
+    Default: 'elvantech-com'
+
+  S3Folder:
+    Description: 'The folder where you loaded the source for the functions.'
+    Type: String
+    Default: 'Lambda_source'
+    
+Resources:
