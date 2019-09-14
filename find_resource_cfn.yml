@@ -19,16 +19,12 @@ Parameters:
 
 Resources:
   # FindResource:
-  #   Type: 'Custom::AMIInfo'
+  #   Type: 'Custom::FindResourceFunction'
   #   Properties:
-  #     ServiceToken: !GetAtt 
-  #       - AMIInfoFunction
-  #       - Arn
+  #     ServiceToken: <lambda arn>
   #     Region: !Ref 'AWS::Region'
-  #     Architecture: !FindInMap 
-  #       - AWSInstanceType2Arch
-  #       - !Ref InstanceType
-  #       - Arch
+  #     SearchType: !Ref SearchType
+  #     SearchArgs: !Ref SearchArgs
   FindResourceFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
