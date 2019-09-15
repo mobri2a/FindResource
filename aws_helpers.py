@@ -365,4 +365,59 @@ class AWSClient:
         except Exception as e:
             raise e
         return 'non-paid'
+
+def getLambdaEnv(parmname, defaultval=None):
+    """
+    Cleanly get the value of a Lambda environmental. Return if found or default
+    """
+    try:
+        myval = os.environ[parmname]
+    except Exception as exc:
+        if str(exc) == f'\'{parmname}\'':
+            myval = defaultval
+            print(
+                'Environmental variable \'' + parmname +
+                '\' not found. Using default [' + str(defaultval) + ']')
+        else:
+            print(exc)
+            print(
+                'ERROR: Environmental variable \'' + parmname +
+                '\' not found. Exiting')
+            raise
+
+    # recast if int or bool
+    if isinstance(defaultval, int):
+        myval = int(myval)
+    elif myval == 'True':
+        myval = True
+    elif myval == 'False':
+        myval = False
+
+    return myval
+
+def configLogging(logLevel):
+    
+    global log # If already set up don't set it up again
+    
+    if log!=None:
+        return log
+    else:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(logging.Formatter('%(asctime)s ::  %(lineno)s ::%(levelname)s :: %(funcName)10s :: %(message)s'))
+        log = logging.getLogger('ConfigDiscoveryLogger')
+        log.addHandler(stream_handler)
+    
+        if logLevel=='DEBUG':
+            log.setLevel(logging.DEBUG)
+        elif logLevel=='INFO':
+            log.setLevel(logging.INFO)
+        elif logLevel=='WARNING':
+            log.setLevel(logging.WARNING)
+        elif logLevel=='ERROR':
+            log.setLevel(logging.ERROR)
+        elif logLevel=='CRITICAL':
+            log.setLevel(logging.CRITICAL)
+        else:
+            log.setLevel(logging.NOTSET)
         
+        return log
