@@ -15,7 +15,7 @@ Parameters:
   S3Key:
     Description: 'Name of the object to load'
     Type: String
-    Default: 'FindResource.zip'
+    Default: 'find_resource.zip'
 
 Resources:
   # FindResource:
@@ -28,17 +28,18 @@ Resources:
   FindResourceFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
+      FunctionName: 'FindResource'
       Code:
         S3Bucket: !Ref S3Bucket
         S3Key: !Join
           - '/'
           - - !Ref S3Folder
             - !Ref S3Key
-      Handler: 'lambda_handler.handler'
+      Handler: 'find_resource.handler'
       Role: !GetAtt 
         - LambdaExecutionRole
         - Arn
-      Runtime: Python 3.6
+      Runtime: python3.6
       Timeout: '30'
   LambdaExecutionRole:
     Type: 'AWS::IAM::Role'
@@ -58,6 +59,12 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:*'
               - Effect: Allow
                 Action:
                   - 'ec2:Describe*'

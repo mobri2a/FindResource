@@ -18,6 +18,8 @@
 import boto3
 from botocore.exceptions import ClientError
 import json
+import logging
+import os
 
 CLIENT = {}
 session = ''
@@ -28,9 +30,10 @@ class AWSClient:
     region = ''
     session = None
 
-    def __init__(self, profile):
-        session = boto3.session.Session(profile_name=profile)
-        boto3.setup_default_session(profile_name=profile)
+    def __init__(self, profile=None):
+        if profile:
+            session = boto3.session.Session(profile_name=profile)
+            boto3.setup_default_session(profile_name=profile)
 
     def connect(self, service, region):
         """
@@ -95,12 +98,15 @@ class AWSClient:
 
         return result
 
-    def get_simple(self, region, service, apimethod, responsekey):
+    def get_simple(self, region, service, apimethod, responsekey, kwargs={}):
         """
         Simple query-capture-return
         """
+
         conn = self.connect(service, region)
-        response = getattr(conn,apimethod)()
+        response = getattr(conn,apimethod)(
+                **kwargs
+            )
 
         return response[responsekey]
 
@@ -395,29 +401,29 @@ def getLambdaEnv(parmname, defaultval=None):
 
     return myval
 
-def configLogging(logLevel):
+def configLogging(logger, logLevel):
     
-    global log # If already set up don't set it up again
+    # global logger # If already set up don't set it up again
     
-    if log!=None:
-        return log
+    if logger:
+        return logger
     else:
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(logging.Formatter('%(asctime)s ::  %(lineno)s ::%(levelname)s :: %(funcName)10s :: %(message)s'))
-        log = logging.getLogger('ConfigDiscoveryLogger')
-        log.addHandler(stream_handler)
+        logger = logging.getLogger('ConfigDiscoveryLogger')
+        logger.addHandler(stream_handler)
     
         if logLevel=='DEBUG':
-            log.setLevel(logging.DEBUG)
+            logger.setLevel(logging.DEBUG)
         elif logLevel=='INFO':
-            log.setLevel(logging.INFO)
+            logger.setLevel(logging.INFO)
         elif logLevel=='WARNING':
-            log.setLevel(logging.WARNING)
+            logger.setLevel(logging.WARNING)
         elif logLevel=='ERROR':
-            log.setLevel(logging.ERROR)
+            logger.setLevel(logging.ERROR)
         elif logLevel=='CRITICAL':
-            log.setLevel(logging.CRITICAL)
+            logger.setLevel(logging.CRITICAL)
         else:
-            log.setLevel(logging.NOTSET)
+            logger.setLevel(logging.NOTSET)
         
-        return log
+        return logger
